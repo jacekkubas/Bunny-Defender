@@ -1,0 +1,38 @@
+<!Doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width">
+    <meta rel="icon" size="196x196" href="bunny.png">
+    <title>Defender</title>
+    <script src="libs/phaser.js"></script>
+    <script src="Boot.js"></script>
+    <script src="Preloader.js"></script>
+    <script src="StartMenu.js"></script>
+    <script src="Game.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer"></div>
+    
+    <script type="text/javascript">
+        window.onload = function () {
+            var game = new Phaser.Game(540, 960, Phaser.AUTO, 'gameContainer');
+            
+            game.state.add('Boot', Defender.Boot);
+            game.state.add('Preloader', Defender.Preloader);
+            game.state.add('StartMenu', Defender.StartMenu);
+            game.state.add('Game', Defender.Game);
+            
+            game.state.start('Boot');
+        }
+    </script>
+</body>
+</html>
