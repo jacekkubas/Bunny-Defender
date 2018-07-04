@@ -21,8 +21,14 @@ Defender.Game.prototype = {
         this.secondsElapsed = 0;
         this.timer = this.time.create(false);
         this.timer.loop(1000, this.updateSeconds, this);
-        this.totalBunnies = 20;
-        this.totalSpaceRocks = 13;
+        if (window.innerHeight > 960) {
+            this.totalBunnies = 20;
+            this.totalSpaceRocks = 13;
+        } else {
+            this.totalBunnies = 15;
+            this.totalSpaceRocks = 10;
+        }
+        
         
         this.music = this.add.audio('game-audio');
         this.music.play('', 0, 0.3, true);
@@ -34,8 +40,16 @@ Defender.Game.prototype = {
     },
     
     buildWorld: function () {
-        this.add.image(0, 0, 'sky');
-        this.add.image(0, 800, 'hill');
+        var sky = this.add.image(0, 0, 'sky');
+        sky.width = this.game.width;
+        sky.height = this.game.height;
+        var hill = this.add.image(0, 800, 'hill');
+        hill.width = this.game.width;
+        if (window.innerHeight > 960) {
+            hill.y = 800
+        } else {
+            hill.y = this.game.height - hill.height;
+        }
         this.buildBunnies();
         this.buildSpaceRocks();
         this.buildEmitter();
@@ -48,7 +62,15 @@ Defender.Game.prototype = {
         this.bunnyGroup.enableBody = true;
         
         for (var i = 0; i < this.totalBunnies; i++) {
-            var b = this.bunnyGroup.create(this.rnd.integerInRange(-10, this.world.width - 50), this.rnd.integerInRange(this.world.height - 180, this.world.height - 60), 'bunny', 'Bunny0000');
+            var width = this.rnd.integerInRange(-10, this.world.width - 50);
+            var height = function () {
+                if (window.innerHeight > 960) {
+                    return this.rnd.integerInRange(this.world.height - 180, this.world.height - 60);
+                } else {
+                    return this.rnd.integerInRange(this.world.height - 130, this.world.height - 30);
+                }
+            }.bind(this);
+            var b = this.bunnyGroup.create(width, height(), 'bunny', 'Bunny0000');
             b.anchor.setTo(0.5, 0.5);
             b.body.moves = false;
             b.animations.add('Rest', this.game.math.numberArray(1, 58));
@@ -88,9 +110,15 @@ Defender.Game.prototype = {
         
         for (var i = 0; i < this.totalSpaceRocks; i++) {
             var r = this.spaceRocksGroup.create(this.rnd.integerInRange(0, this.world.width), this.rnd.realInRange(-1500, 0), 'spaceRock', 'SpaceRock0000');
-            var scale = this.rnd.realInRange(0.3, 1.0);
-            r.scale.x = scale;
-            r.scale.y = scale;
+            var scale = function () {
+                if (window.innerHeight > 960) {
+                    return this.rnd.realInRange(0.3, 1.0);
+                } else {
+                    return this.rnd.realInRange(0.2, 0.7);
+                }
+            }.bind(this);
+            r.scale.x = scale();
+            r.scale.y = scale();
             this.physics.enable(r, Phaser.Physics.ARCADE);
             r.enableBody = true;
             r.body.velocity.y = this.rnd.integerInRange(200, 400);
@@ -117,10 +145,17 @@ Defender.Game.prototype = {
     
     buildEmitter: function () {
         this.burst = this.add.emitter(0, 0, 80);
-        this.burst.minParticleScale = 0.3;
-        this.burst.maxParticleScale = 1.2;
-        this.burst.minParticleSpeed.setTo(-30, 30);
-        this.burst.maxParticleSpeed.setTo(30, -30);
+        if (window.innerHeight > 960) {
+            this.burst.minParticleScale = 0.3;
+            this.burst.maxParticleScale = 1.2;
+            this.burst.minParticleSpeed.setTo(-30, 30);
+            this.burst.maxParticleSpeed.setTo(30, -30);
+        } else {
+            this.burst.minParticleScale = 0.1;
+            this.burst.maxParticleScale = 0.6;
+            this.burst.minParticleSpeed.setTo(-15, 15);
+            this.burst.maxParticleSpeed.setTo(15, -15);
+        }
         this.burst.makeParticles('explosion');
         this.input.onDown.add(this.fireBurst, this);
     },
@@ -129,7 +164,11 @@ Defender.Game.prototype = {
         if (this.gameover == false) {
             this.burst.emitX = pointer.x;
             this.burst.emitY = pointer.y;
-            this.burst.start(true, 2000, null, 20);
+            if (window.innerHeight > 960) {
+                this.burst.start(true, 2000, null, 20);
+            } else {
+                this.burst.start(true, 1000, null, 20);
+            }
             this.bum.play();
             this.bum.volume = 0.2;
         }
@@ -161,7 +200,15 @@ Defender.Game.prototype = {
             this.gameover = true;
             this.music.stop();
             this.countdown.setText('Bunnies left: 0');
-            this.overMessage = this.add.bitmapText(this.world.centerX - 180, this.world.centerY - 40, 'eightbitwonder', 'Game Over\n\n' + this.secondsElapsed, 42);
+            var fontSize = function () {
+                if (window.innerHeight > 960) {
+                    return 42;
+                } else {
+                    return 24;
+                }   
+            }
+            this.overMessage = this.add.bitmapText(this.world.centerX - 180, this.world.centerY - 40, 'eightbitwonder', 'Game Over\n\n' + this.secondsElapsed, fontSize());
+            this.overMessage.x = this.world.centerX - (this.overMessage.textWidth / 2);
             this.overMessage.align = 'center';
             this.overMessage.inputEnabled = true;
             this.overMessage.events.onInputDown.addOnce(this.quitGame, this);

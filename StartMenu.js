@@ -8,6 +8,8 @@ Defender.StartMenu.prototype = {
     create: function () {
         this.ding = this.add.audio('select-audio');
         StartBG = this.add.image(0, 0, 'titleScreen');
+        StartBG.width = this.game.width;
+        StartBG.height = this.game.height;
         StartBG.inputEnabled = true;
         StartBG.events.onInputDown.addOnce(this.startGame, this);
         

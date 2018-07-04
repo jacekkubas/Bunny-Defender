@@ -23,8 +23,23 @@
     <div id="gameContainer"></div>
     
     <script type="text/javascript">
+        var height = function () {
+            if (window.innerHeight > 960) {
+                return 960;
+            } else {
+                return window.innerHeight;
+            }
+        }
+        
+        var width = function () {
+            if (window.innerHeight > 960) {
+                return 540;
+            } else {
+                return window.innerHeight / 1.777777;
+            }
+        }
         window.onload = function () {
-            var game = new Phaser.Game(540, 960, Phaser.AUTO, 'gameContainer');
+            var game = new Phaser.Game(width(), height(), Phaser.AUTO, 'gameContainer');
             
             game.state.add('Boot', Defender.Boot);
             game.state.add('Preloader', Defender.Preloader);
